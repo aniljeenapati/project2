@@ -4,13 +4,13 @@ provider "google" {
 }
 
 resource "google_compute_instance" "centos_vm" {
-  name         = "centosvm"
+  name         = "centos-vm"
   machine_type = "e2-medium"
   zone         = "us-central1-a"
 
   boot_disk {
     initialize_params {
-      image = "centos-cloud/centos-stream-9"  # Correct image family
+      image = "centos-cloud/centos-stream-9"
     }
   }
 
@@ -21,13 +21,16 @@ resource "google_compute_instance" "centos_vm" {
   }
 
   metadata = {
-    ssh-keys = "centos:${file("/root/.ssh/id_rsa.pub")}"  # Update this path to your public key
+    ssh-keys = "centos:${file("/root/.ssh/id_rsa.pub")}"
   }
   
   tags = ["http-server"]
-
   provisioner "local-exec" {
-    command = "mkdir -p ansible && echo ${self.network_interface.0.access_config.0.nat_ip} > ansible/inventory"
+    command = <<EOF
+      mkdir -p ansible
+      echo "[webserver]" > ansible/inventory
+      echo "${self.network_interface.0.access_config.0.nat_ip} ansible_user=centos ansible_ssh_private_key_file=/root/.ssh/id_rsa" >> ansible/inventory
+    EOF
   }
 }
 
