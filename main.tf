@@ -4,7 +4,7 @@ provider "google" {
 }
 
 resource "google_compute_instance" "centos_vm" {
-  name         = "centos-vm-sekhar"
+  name         = "centos-vm"
   machine_type = "e2-medium"
   zone         = "us-central1-a"
 
