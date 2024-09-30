@@ -12,12 +12,3 @@
         name: httpd
         state: started
         enabled: yes
-
-    - name: Allow HTTP service through firewall
-      ansible.builtin.firewall:
-        state: enabled
-        permanent: yes
-        service: http
-
-    - name: Reload firewall
-      command: firewall-cmd --reload
