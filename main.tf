@@ -4,7 +4,7 @@ provider "google" {
 }
 
 resource "google_compute_instance" "centos_vm" {
-  name         = "centos-vm3"
+  name         = "centos-vm2"
   machine_type = "e2-medium"
   zone         = "us-central1-a"
 
@@ -26,13 +26,24 @@ resource "google_compute_instance" "centos_vm" {
 
   tags = ["http-server"]
 
-provisioner "local-exec" {
-  command = <<EOT
-    mkdir -p ansible && \
-    echo "[web]" > ansible/inventory && \
-    echo "${self.network_interface.0.access_config.0.nat_ip}" >> ansible/inventory
-  EOT
-}
+  // Local-exec provisioner to create the inventory.gcp.yml file
+  provisioner "local-exec" {
+    command = <<EOT
+      mkdir -p ansible && \
+      echo "---" > ansible/inventory.gcp.yml && \
+      echo "plugin: gcp_compute" >> ansible/inventory.gcp.yml && \
+      echo "projects:" >> ansible/inventory.gcp.yml && \
+      echo "  - primal-gear-436812-t0" >> ansible/inventory.gcp.yml && \
+      echo "zones:" >> ansible/inventory.gcp.yml && \
+      echo "  - us-central1-a" >> ansible/inventory.gcp.yml && \
+      echo "auth_kind: serviceaccount" >> ansible/inventory.gcp.yml && \
+      echo "service_account_file: /path/to/your/service-account.json" >> ansible/inventory.gcp.yml && \
+      echo "hostnames:" >> ansible/inventory.gcp.yml && \
+      echo "  - name" >> ansible/inventory.gcp.yml && \
+      echo "filters:" >> ansible/inventory.gcp.yml && \
+      echo "  - status = RUNNING" >> ansible/inventory.gcp.yml
+    EOT
+  }
 }
 
 output "vm_ip" {
