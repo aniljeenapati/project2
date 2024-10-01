@@ -42,7 +42,7 @@ resource "google_compute_instance" "centos_vm" {
 
   # Using a provisioner to write the VM's public IP to the Ansible inventory file
   provisioner "local-exec" {
-    command = "mkdir -p ansible && echo ${self.network_interface.0.access_config.0.nat_ip} > ansible/inventory"
+    command = "mkdir -p ansible && echo ${self.network_interface.0.access_config.0.nat_ip} > ansible/inventory.txt"
   }
 }
 
