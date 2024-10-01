@@ -5,7 +5,7 @@ provider "google" {
 
 # Creating a firewall rule to allow HTTP traffic
 resource "google_compute_firewall" "http-server" {
-  name    = "http-server"
+  name    = "http-server1"
   network = "default"
 
   allow {
