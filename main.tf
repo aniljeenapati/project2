@@ -20,7 +20,7 @@ resource "google_compute_firewall" "http-server" {
 
 # Creating the CentOS VM instance
 resource "google_compute_instance" "centos_vm" {
-  name         = "centos-vm"
+  name         = "centos-vm1"
   machine_type = "e2-medium"
   zone         = "us-central1-a"
 
@@ -34,8 +34,6 @@ resource "google_compute_instance" "centos_vm" {
     network = "default"
     access_config {}
   }
-
-  # Specify your SSH key for accessing the VM
   metadata = {
     ssh-keys = "centos:${file("/root/.ssh/id_rsa.pub")}"  # Update this path to your public key
   }
