@@ -4,7 +4,7 @@ provider "google" {
 }
 
 resource "google_compute_instance" "centos_vm" {
-  name         = "centosvm"
+  name         = "centosvm1"
   machine_type = "e2-medium"
   zone         = "us-central1-a"
 
@@ -21,7 +21,7 @@ resource "google_compute_instance" "centos_vm" {
   }
 
   metadata = {
-    ssh-keys = "centos:${file("/root/.ssh/id_rsa.pub")}"
+    ssh-keys = "ansible:${file("/root/.ssh/id_rsa.pub")}"
   }
   
   tags = ["http-server"]
@@ -29,7 +29,7 @@ resource "google_compute_instance" "centos_vm" {
     command = <<EOF
       mkdir -p ansible
       echo "[webserver]" > ansible/inventory
-      echo "${self.network_interface.0.access_config.0.nat_ip} ansible_user=centos ansible_ssh_private_key_file=/root/.ssh/id_rsa" >> ansible/inventory
+      echo "${self.network_interface.0.access_config.0.nat_ip} ansible_user=ansible ansible_ssh_private_key_file=/root/.ssh/id_rsa" >> ansible/inventory
     EOF
   }
 }
