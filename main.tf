@@ -4,7 +4,7 @@ provider "google" {
 }
 
 resource "google_compute_instance" "centos_vm" {
-  name         = "centosvm3"
+  name         = "centosvm43"
   machine_type = "e2-medium"
   zone         = "us-central1-a"
 
