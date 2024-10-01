@@ -1,48 +1,38 @@
 provider "google" {
-  project = "primal-gear-436812-t0"  # Update with your GCP project ID
+  project = "primal-gear-436812-t0"
   region  = "us-central1"
 }
 
-# Creating a firewall rule to allow HTTP traffic
-resource "google_compute_firewall" "http-server" {
-  name    = "http-server1"
-  network = "default"
-
-  allow {
-    protocol = "tcp"
-    ports    = ["80"]
-  }
-
-  # Allow traffic from everywhere to instances with an HTTP server tag
-  source_ranges = ["0.0.0.0/0"]
-  target_tags   = ["http-server"]
-}
-
-# Creating the CentOS VM instance
 resource "google_compute_instance" "centos_vm" {
-  name         = "centos-vm1"
+  name         = "centos-vm"
   machine_type = "e2-medium"
   zone         = "us-central1-a"
 
   boot_disk {
     initialize_params {
-      image = "centos-cloud/centos-stream-9"  # Correct image family
+      image = "centos-cloud/centos-stream-9"
     }
   }
 
   network_interface {
     network = "default"
-    access_config {}
+    access_config {
+    }
   }
+
   metadata = {
-    ssh-keys = "centos:${file("/root/.ssh/id_rsa.pub")}"  # Update this path to your public key
+    ssh-keys = "centos:${file("/root/.ssh/id_rsa.pub")}"
   }
 
   tags = ["http-server"]
 
-  # Using a provisioner to write the VM's public IP to the Ansible inventory file
   provisioner "local-exec" {
-    command = "mkdir -p ansible && echo ${self.network_interface.0.access_config.0.nat_ip} > ansible/inventory.txt"
+    command = <<EOT
+      mkdir -p ansible && \
+      echo "---" > ansible/inventory.yml && \
+      echo "[web]" >> ansible/inventory.yml && \
+      echo "${self.network_interface.0.access_config.0.nat_ip}" >> ansible/inventory.yml
+    EOT
   }
 }
 
