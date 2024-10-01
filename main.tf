@@ -4,8 +4,8 @@ provider "google" {
 }
 
 resource "google_compute_instance" "centos_vm" {
-  name         = "centos-vm1"
-  machine_type = "e2-medium"
+  name         = "centos-vm"
+  machine_type = "e2-medium2"
   zone         = "us-central1-a"
 
   boot_disk {
