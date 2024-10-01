@@ -33,7 +33,18 @@ resource "google_compute_instance" "centos_vm" {
     EOF
   }
 }
+resource "google_compute_firewall" "http-server" {
+  name    = "http-server-firewall"
+  network = "default"
 
+  allow {
+    protocol = "tcp"
+    ports    = ["80"]
+  }
+
+  source_ranges = ["0.0.0.0/0"]
+  target_tags   = ["http-server"]
+}
 output "vm_ip" {
   value = google_compute_instance.centos_vm.network_interface.0.access_config.0.nat_ip
 }
