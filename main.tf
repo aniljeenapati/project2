@@ -26,14 +26,13 @@ resource "google_compute_instance" "centos_vm" {
 
   tags = ["http-server"]
 
-  provisioner "local-exec" {
-    command = <<EOT
-      mkdir -p ansible && \
-      echo "---" > ansible/inventory && \
-      echo "[web]" >> ansible/inventory && \
-      echo "${self.network_interface.0.access_config.0.nat_ip}" >> ansible/inventory
-    EOT
-  }
+provisioner "local-exec" {
+  command = <<EOT
+    mkdir -p ansible && \
+    echo "[web]" > ansible/inventory && \
+    echo "${self.network_interface.0.access_config.0.nat_ip}" >> ansible/inventory
+  EOT
+}
 }
 
 output "vm_ip" {
