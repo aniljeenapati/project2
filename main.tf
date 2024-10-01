@@ -29,9 +29,9 @@ resource "google_compute_instance" "centos_vm" {
   provisioner "local-exec" {
     command = <<EOT
       mkdir -p ansible && \
-      echo "---" > ansible/inventory.yml && \
-      echo "[web]" >> ansible/inventory.yml && \
-      echo "${self.network_interface.0.access_config.0.nat_ip}" >> ansible/inventory.yml
+      echo "---" > ansible/inventory && \
+      echo "[web]" >> ansible/inventory && \
+      echo "${self.network_interface.0.access_config.0.nat_ip}" >> ansible/inventory
     EOT
   }
 }
