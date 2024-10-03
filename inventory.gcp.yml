@@ -1,0 +1,13 @@
+plugin: gcp_compute
+projects:
+  - primal-gear-436812-t0
+zones:
+  - us-central1-a
+auth_kind: serviceaccount
+service_account_file: /path/to/your/service/account/key.json
+groups:
+  web: "'name' in name"
+hostnames:
+  - 'networkInterfaces[0].accessConfigs[0].natIP'
+compose:
+  ansible_host: networkInterfaces[0].accessConfigs[0].natIP
