@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "primal-gear-436812-t0",
+  "private_key_id": "d66297d1519ae6f3fffeb98189fe5dd322f151c8",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCol3CADNjxylUa\n3ZISP9rYjLb3+XVyZW7vdp1HIikInWMQyLxhdUcoJdllY+Ilq8gTPR//PuRNB0RJ\n/ostDTNSW18QeJI/uq+FWOJlRIO0MVtGYwmFZp2uJ21CCR1Wj4+ILhhsy2xOYgP2\nhoPXdLalq9wWtbMVG22n8RGcJMBaecnsod8Qp8p26zvHF1AjAFfLgCvM42i010dL\neokYyrrb+mD9CJXYe4F3RcMSKuUUbESEbuSDGTxgmgRiMPv5KOKsuDrOI5AofG1d\n6qmcRSJKScO5hQif/6S+83O6dBOxG3yZYXi+TNTbPJI/CfnHwQWXG029TPYBpEzf\nbZFZ20lbAgMBAAECggEASUclnWq4IwQ8UISM+ISrtSMYZhkWDOZ8vPWz79avujBa\nflGZ28xzZMZqwxCSm6gaOw5+6V0nMznc20KZsLfDnmDbpZeajbuxjcawBK8uhbRM\nRYBHg6WyFJ/Lc//tMhINI3ZRpHwYs8sTiOQ3yv7OYp0b+Pz5/UsiMvRroJAy0T/X\nrVBEXrkqgqKdZ07naU5DapE/ezUgT5nyaV5JEqTgdj/xBfC19kTlSUiIXBcFYSrB\n+vcCLjmwTJZcXJrDJv+u4lBk5NeDIb67VVVXDe2we/uwQk98nHVFE0zUnH+05z0E\nOkYilNOOEAlxOme5deTw9kl78pbLWxwMX8vROxpcAQKBgQDn5XFZIIUOkkHHHanv\nUQWo5ZhwKyUQx+xraa13ZcCQlhpd2YLHyPsBSGT4G1FxmLbei57Nc/FFtwUYi6Qb\nFzzHCoXI6hctb3B5SDlBgFKuRj4Jte18e8K5VTvaQFPR6Ygm+bKvBjQCDYctS0lV\nUDgYbdaEe/qVkD7jl/vZRfG9WwKBgQC6HYOKCmr80Tny5PIR2EcOtdYr/ha56dm7\n6GjD9AZ+M6C0hppBeywd09UHC8JBgAxPgJo6wOqM6gD5BboCTYxFdZChroSa+GgO\naoiSFKbkGt8N7i/qCdyzHPNp2hGT2FrjIqk0LghTAvz1zU1LjqQy5ypDaSL6yXu9\nWqghenZkAQKBgDKLy4oe0YHclWPebmUQpwgqi3CfpuOigEDldv8YecHKRhMAz0XW\n5AdijUebRMRbAjk9+65SwFtuyjiQb4PMK95Cx+iEResMaFq3SGujmeIMw4cAVbSV\nkVsuXe5zqRGPMrM0KCOIWZu88SMJTwG+i4ufnWuhTnx9RYf8X9P7L/cTAoGAIzEB\ndlCR+kv1kSAJRaaHiRiI7riUw4KcUROY+7RgpexNLtVkxYzswpcTaMmoaYo0ybOf\ndgyUTSDSHkQe7+CJ7XhVaLz/Be6CfndWa4jMJcWO96taE/7ZZGTNAe7h8/qs9NXQ\n+LTbjha6jh/LxcWq9pUPQL/YhWMjqqJBuFLXoAECgYEArCDiwqahTbKZL6TNxOwl\n/yAnIn+BlNyQNlDyTMiTQoHa111G1msbt40xoRl+cPEc03VAAjlHs98Sa9DDHJg8\nazD0OMC5Md/9xKGccD8c/5hhCxD1ZyW4liYZhfIDa1qAuw/VgFa2i/qer6LAwUFN\nyDvt8gnNy3RMnagz4wGhCMg=\n-----END PRIVATE KEY-----\n",
+  "client_email": "anil-jenkins@primal-gear-436812-t0.iam.gserviceaccount.com",
+  "client_id": "103107408266581757650",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/anil-jenkins%40primal-gear-436812-t0.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
