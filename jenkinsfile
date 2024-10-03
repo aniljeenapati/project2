@@ -1,0 +1,70 @@
+pipeline {
+    agent any
+    environment {
+        GOOGLE_APPLICATION_CREDENTIALS = credentials('gcp-sa')  // GCP Service Account JSON key from Jenkins credentials
+    }
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git branch: 'main', url: 'https://github.com/aniljeenapati/project2.git'
+            }
+        }
+        stage('Terraform Init') {
+            steps {
+                sh 'terraform init'
+            }
+        }
+        stage('Terraform Apply') {
+            steps {
+                withCredentials([file(credentialsId: 'gcp-sa', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                    sh 'terraform apply -auto-approve'
+                }
+            }
+        }
+        stage('Wait for VM to be ready') {
+            steps {
+                sleep(time: 60, unit: "SECONDS")  // Adjust this time based on your VM startup time
+            }
+        }
+        stage('Generate and Update Ansible Inventory') {
+            steps {
+                script {
+                    // Extract VM IP from Terraform output
+                    def vmIp = sh(script: "terraform output -raw vm_ip", returnStdout: true).trim()
+                    
+                    // Write the Ansible inventory file
+                    def inventoryContent = """
+                    all:
+                      hosts:
+                        web:
+                          ansible_host: ${vmIp}
+                          ansible_user: centos
+                          ansible_ssh_private_key_file: /root/.ssh/id_rsa
+                    """
+                    writeFile file: '/var/lib/jenkins/workspace/terra-ans/ansible/inventory.gcp.yml', text: inventoryContent
+                }
+            }
+        }
+        stage('Add Host Key to SSH Known Hosts') {
+            steps {
+                script {
+                    // Add the VM IP to SSH known_hosts to avoid SSH fingerprint confirmation
+                    def vmIp = sh(script: "terraform output -raw vm_ip", returnStdout: true).trim()
+                    sh "ssh-keyscan -H ${vmIp} >> /root/.ssh/known_hosts || true"
+                }
+            }
+        }
+        stage('Install Apache using Ansible') {
+            steps {
+                withEnv(['ANSIBLE_CONFIG=ansible/ansible.cfg']) {  // Ensure the ansible.cfg is correctly set up
+                    sh 'ansible-playbook -i /var/lib/jenkins/workspace/terra-ans/inventory.gcp.yml /var/lib/jenkins/workspace/terra-ans/apache_install.yml'
+                }
+            }
+        }
+    }
+    post {
+        always {
+            cleanWs()  // Clean up the workspace after the pipeline run
+        }
+    }
+}
