@@ -4,7 +4,7 @@ projects:
 zones:
   - us-central1-a
 auth_kind: serviceaccount
-service_account_file: /path/to/your/service/account/key.json
+service_account_file: /key.json
 groups:
   web: "'name' in name"
 hostnames:
