@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "primal-gear-436812-t0",
+  "private_key_id": "b6c29fc3c15f877927c4f50e244158c337d145c6",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDZsB+kdpqdFkcA\nSoNyjZ8Y2X+f6vT7fqu0lnf+Rie8IKb7nKIdqvUxC1xcsBJPoOnJ+StOt6vRt0zi\nK/pZfBrDFBi70NtNknJGmyiosAIGqOQmLdc6WpjAfEheOPMnIVHWs1bKVNNKYlKO\na8TB3J4nd4WKkU4OvdqDlZ1dtfiVJXHfKIVs57hivG/nKVSAO7RS1sVh0wY4Dkau\nHR2T2TyRSUv99qxvl1ef7w5Pb8cOfFRBIGS0ZijYmW5Y6etwWvx1iUL/QkhvHq20\n1KGsj77zOOhTHbEvFbSWmdXcdGUl99Q6SQ+b+Rm5burn0UALfjvJ2ywMGmtDNEcc\nDwACRYQXAgMBAAECggEAI+Nl7BLDnbdBAFrIffe8LXgaEs7FEbtJ6o1N/gUp4tmN\nPfkOPw7iunGxifRbKHaSZIJoMeOU94+dJMJ0VRFhRh0HkNs3dHv6zAojc2AFDX0F\nlAfFrnCmM0GqGqKP77kOCXPqkJPYe7BnBOTefMl253HMedJHyKVjI4NkfMEV2NyU\nKVgDOS6A2QwsL5AP/Ycrq3QrRpKFW4SIr3a8vr75/DSAoYQwetQMFcWvpXBH5Gq7\noWEnX6v15mK2pkdYeVopcecz2AMNDuJpfEbOBulCpAjCAIAdU+GQUU/VVaZwYtQE\ntwXkA5P/0OhsgtfHFjej2erLbIUcLen/zFQE05I7EQKBgQDsJUUgQXAeSBqP7RcC\nfMGB3uh4Xmwfl/AG0/EzaWntV/08Jt6Kgug6EknIZSkQghtGoTnnS4TToZVZXgCm\nlK68UbhjMDVQNw/I/V6hs3VZSa14lIGfdU7DOxlXzIR763d8D6r7epbyqkVqnySr\nzZcKOaNI4YwUER0LzrR1Vs26MQKBgQDr/ZPRX/qs8H4LV8NP4QXO7IlJ4UabnCDZ\n1qejkgTcBSW0mEY6nPQjO3UFxeJcoy50NFLY/ZAb1QP8gSwjijXSXWZ4pAl5HW1R\nATyVIeivrMHxfGHzzOyfhZovVwMdMdHftMAB4AMGO861UPLDCYjLtszduJZ/l9Ps\nnnlN8LxIxwKBgBGghpRtzgy0nSb5L6qD3X3wQbIaej+xe71GvM51o+6PjtuamyoD\ns4oCK3fF9VbCH38aMdROEtApU5ikJ7BHkPOFthnRU2l1crwyDYpMdwn/Me+6RiK9\nAvAXzUB8h7coUHb2RHEZKYNbqmrXDkm0wv2EZ+fczjQBQwXKnDXWEO1BAoGBAJa3\n3TBbnD3XWqjj5Fmf3ZXKe+QzfGTl0hVOgsJ0/6WFpA8zMac9lq7pylNljqybi4+r\n2z26s88SvPkHhqksHDO+czOZkHNJ2AdkQsz8Wx/XtgYE6opK1tUK/u49JEABEYlO\nZ1LLPyM8D0i96k2mSTfSCAWTXose7Lqye8bLeXUBAoGAV/Ea9x961VVaFuXqr41G\nqFgEAi5iqCVLo5wEq22Glnc5S2HTcUgeig7ghyr9qstDhj99Ph+NLW4zZcFtZC09\n3kLxTwVA7gGlgw1ERTQGlF5BJnsiKeu2s3Sm5w4jCk1tkpghE6umkJy0FwPQJeIo\niuFrGtx57zXmKJq4uJ99nFc=\n-----END PRIVATE KEY-----\n",
+  "client_email": "jenkins@primal-gear-436812-t0.iam.gserviceaccount.com",
+  "client_id": "100342658124320591332",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/jenkins%40primal-gear-436812-t0.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
