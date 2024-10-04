@@ -1,45 +1,84 @@
 provider "google" {
-  project = "primal-gear-436812-t0"  # Replace with your project ID
-  region  = "us-central1"
+  project     = "primal-gear-436812-t0"            
+  region      = "us-central1"               
 }
+resource "google_compute_instance_template" "default" {
+  name           = "apache-instance-template"
+  machine_type   = "e2-medium"
+  region         = "us-central1"
 
-resource "google_compute_instance" "centos_vm" {
-  name         = "centos-vm"
-  machine_type = "e2-medium"
-  zone         = "us-central1-a"
-
-  boot_disk {
-    initialize_params {
-      image = "centos-cloud/centos-stream-9"
-    }
+  disk {
+    auto_delete  = true
+    boot         = true
+    source_image = "projects/debian-cloud/global/images/family/debian-11"
   }
 
   network_interface {
     network = "default"
-    access_config {
-    }
+    access_config {}
   }
-
-  metadata = {
-    ssh-keys = "centos:${file("/root/.ssh/id_rsa.pub")}"  # Path to your SSH public key
+resource "google_compute_instance_group_manager" "default" {
+  name               = "apache-instance-group"
+  version {
+    instance_template = google_compute_instance_template.default.id
   }
+  base_instance_name = "apache-instance"
+  target_size        = 2
+  zone               = "us-central1-a"
 
-  tags = ["http-server"]
+  named_port {
+    name = "http"
+    port = 80
+  }
 }
 
-# Output the public IP address of the VM
-output "vm_ip" {
-  value = google_compute_instance.centos_vm.network_interface.0.access_config.0.nat_ip
+resource "google_compute_backend_service" "default" {
+  name          = "apache-backend-service"
+  backend {
+    group = google_compute_instance_group_manager.default.instance_group
+  }
+  health_checks = [google_compute_http_health_check.default.id]
+  port_name     = "http"
+  protocol      = "HTTP"
+  timeout_sec   = 30
+  load_balancing_scheme = "EXTERNAL"
 }
 
-# Local-exec to write the IP address to the Ansible inventory file
+resource "google_compute_http_health_check" "default" {
+  name                    = "apache-health-check"
+  request_path            = "/"
+  port                    = 80
+  check_interval_sec      = 20
+  timeout_sec             = 15
+  healthy_threshold       = 1
+  unhealthy_threshold     = 3
+}
+
+resource "google_compute_url_map" "default" {
+  name            = "apache-url-map"
+  default_service = google_compute_backend_service.default.id
+}
+
+resource "google_compute_target_http_proxy" "default" {
+  name    = "apache-http-proxy"
+  url_map = google_compute_url_map.default.id
+}
+
+resource "google_compute_global_forwarding_rule" "default" {
+  name       = "apache-forwarding-rule"
+  target     = google_compute_target_http_proxy.default.id
+  port_range = "80"
+}
+output "lb_external_ip" {
+  value = google_compute_global_address.lb_ip.address
+}
 resource "null_resource" "update_inventory" {
   provisioner "local-exec" {
     command = <<EOT
       echo 'all:
   hosts:
     web:
-      ansible_host: ${google_compute_instance.centos_vm.network_interface.0.access_config.0.nat_ip}
+      ansible_host: ${google_compute_global_address.lb_ip.address}
       ansible_user: centos
       ansible_ssh_private_key_file: /root/.ssh/id_rsa
 ' > /var/lib/jenkins/workspace/terra-ans/inventory.gcp.yml
