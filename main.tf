@@ -1,11 +1,10 @@
 provider "google" {
-  project     = "primal-gear-436812-t0"            
-  region      = "us-central1"               
+  project = "primal-gear-436812-t0"
 }
+
 resource "google_compute_instance_template" "default" {
   name           = "apache-instance-template"
   machine_type   = "e2-medium"
-  region         = "us-central1"
 
   disk {
     auto_delete  = true
@@ -17,6 +16,8 @@ resource "google_compute_instance_template" "default" {
     network = "default"
     access_config {}
   }
+}
+
 resource "google_compute_instance_group_manager" "default" {
   name               = "apache-instance-group"
   version {
@@ -69,9 +70,15 @@ resource "google_compute_global_forwarding_rule" "default" {
   target     = google_compute_target_http_proxy.default.id
   port_range = "80"
 }
+
+resource "google_compute_global_address" "lb_ip" {
+  name = "apache-lb-ip"
+}
+
 output "lb_external_ip" {
   value = google_compute_global_address.lb_ip.address
 }
+
 resource "null_resource" "update_inventory" {
   provisioner "local-exec" {
     command = <<EOT
@@ -85,6 +92,5 @@ resource "null_resource" "update_inventory" {
     EOT
   }
 
-  # Ensure the VM creation happens before the inventory update
-  depends_on = [google_compute_instance.centos_vm]
+  depends_on = [google_compute_instance_group_manager.default]
 }
