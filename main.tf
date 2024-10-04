@@ -10,7 +10,7 @@ resource "google_compute_instance_template" "default" {
   disk {
     auto_delete  = true
     boot         = true
-    source_image = "projects/debian-cloud/global/images/family/debian-11"
+    source_image = "centos-cloud/centos-stream-9"
   }
 
   network_interface {
