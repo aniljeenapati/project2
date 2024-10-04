@@ -88,7 +88,7 @@ resource "null_resource" "update_inventory" {
       ansible_host: ${google_compute_global_address.lb_ip.address}
       ansible_user: centos
       ansible_ssh_private_key_file: /root/.ssh/id_rsa
-' > /var/lib/jenkins/workspace/terra-ans/inventory.gcp.yml
+' > /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml
     EOT
   }
 
