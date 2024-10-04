@@ -97,4 +97,3 @@ resource "null_resource" "update_inventory" {
 
   depends_on = [google_compute_instance_group_manager.default]
 }
-
