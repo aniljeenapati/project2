@@ -3,11 +3,6 @@
   hosts: web
   become: yes
   tasks:
-    - name: Update the package manager
-      yum:
-        name: "*"
-        state: latest
-
     - name: Install Apache
       yum:
         name: httpd
