@@ -75,6 +75,10 @@ resource "google_compute_global_address" "lb_ip" {
   name = "apache-lb-ip"
 }
 
+output "lb_external_ip" {
+  value = google_compute_global_address.lb_ip.address
+}
+
 resource "null_resource" "update_inventory" {
   provisioner "local-exec" {
     command = <<EOT
