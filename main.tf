@@ -88,10 +88,10 @@ resource "null_resource" "update_inventory" {
 
       for INSTANCE_ID in $INSTANCE_IDS; do
         INSTANCE_IP=$(gcloud compute instances describe $INSTANCE_ID --zone us-central1-a --format="value(networkInterfaces[0].accessConfigs[0].natIP)")
-        echo "${INSTANCE_ID}:" >> $INVENTORY_FILE
+        echo "$${INSTANCE_ID}:" >> $INVENTORY_FILE
         echo "  hosts:" >> $INVENTORY_FILE
-        echo "    web_${INSTANCE_ID}:" >> $INVENTORY_FILE
-        echo "      ansible_host: ${INSTANCE_IP}" >> $INVENTORY_FILE
+        echo "    web_$${INSTANCE_ID}:" >> $INVENTORY_FILE
+        echo "      ansible_host: $${INSTANCE_IP}" >> $INVENTORY_FILE
         echo "      ansible_user: centos" >> $INVENTORY_FILE
         echo "      ansible_ssh_private_key_file: /root/.ssh/id_rsa" >> $INVENTORY_FILE
       done
