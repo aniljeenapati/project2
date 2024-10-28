@@ -34,14 +34,14 @@ resource "google_compute_instance_group_manager" "default" {
 }
 
 resource "google_compute_backend_service" "default" {
-  name          = "apache-backend-service"
+  name                  = "apache-backend-service"
   backend {
     group = google_compute_instance_group_manager.default.instance_group
   }
-  health_checks = [google_compute_http_health_check.default.id]
-  port_name     = "http"
-  protocol      = "HTTP"
-  timeout_sec   = 30
+  health_checks         = [google_compute_http_health_check.default.id]
+  port_name             = "http"
+  protocol              = "HTTP"
+  timeout_sec           = 30
   load_balancing_scheme = "EXTERNAL"
 }
 
@@ -77,30 +77,4 @@ resource "google_compute_global_address" "lb_ip" {
 
 output "lb_external_ip" {
   value = google_compute_global_address.lb_ip.address
-}
-
-resource "null_resource" "update_inventory" {
-  provisioner "local-exec" {
-    command = <<EOT
-      # Create inventory file if it doesn't exist
-      mkdir -p /var/lib/jenkins/workspace/loadbalancer
-      touch /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml
-      echo "" > /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml  # Clear file content
-
-      INSTANCE_IDS=$(gcloud compute instance-groups managed list-instances apache-instance-group --zone us-central1-a --project primal-gear-436812-t0 --format="value(instance)")
-
-      for INSTANCE_ID in $INSTANCE_IDS; do
-        INSTANCE_IP=$(gcloud compute instances describe $INSTANCE_ID --zone us-central1-a --project primal-gear-436812-t0 --format="value(networkInterfaces[0].accessConfigs[0].natIP)")
-        
-        # Append instance information to inventory file
-        echo "$${INSTANCE_ID}:" >> /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml
-        echo "  hosts:" >> /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml
-        echo "    web_$${INSTANCE_ID}:" >> /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml
-        echo "      ansible_host: $${INSTANCE_IP}" >> /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml
-        echo "      ansible_user: centos" >> /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml
-        echo "      ansible_ssh_private_key_file: /root/.ssh/id_rsa" >> /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml
-      done
-    EOT
-  }
-  depends_on = [google_compute_instance_group_manager.default]
 }
