@@ -86,9 +86,9 @@ resource "null_resource" "update_inventory" {
 
       for INSTANCE_ID in $INSTANCE_IDS; do
         INSTANCE_IP=$(gcloud compute instances describe $INSTANCE_ID --zone us-central1-a --format="value(networkInterfaces[0].accessConfigs[0].natIP)")
-        echo "${INSTANCE_ID}:" >> /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml
+        echo "$${INSTANCE_ID}:" >> /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml
         echo "  hosts:" >> /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml
-        echo "    web_${INSTANCE_ID}:" >> /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml
+        echo "    web_$${INSTANCE_ID}:" >> /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml
         echo "      ansible_host: $${INSTANCE_IP}" >> /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml
         echo "      ansible_user: centos" >> /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml
         echo "      ansible_ssh_private_key_file: /root/.ssh/id_rsa" >> /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml
