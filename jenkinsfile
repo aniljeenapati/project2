@@ -1,7 +1,8 @@
 pipeline {
     agent any
     environment {
-        GOOGLE_APPLICATION_CREDENTIALS = credentials('gcp-sa')  // GCP Service Account JSON key from Jenkins credentials
+        GOOGLE_APPLICATION_CREDENTIALS = credentials('gcp-sa')
+        
     }
     stages {
         stage('Checkout Code') {
@@ -23,48 +24,48 @@ pipeline {
         }
         stage('Wait for VM to be ready') {
             steps {
-                sleep(time: 60, unit: "SECONDS")  // Adjust this time based on your VM startup time
+                sleep(time: 30, unit: "SECONDS")
             }
         }
-        stage('Generate and Update Ansible Inventory') {
+        stage('Create Ansible Inventory') {
             steps {
                 script {
-                    // Extract VM IP from Terraform output
-                    def vmIp = sh(script: "terraform output -raw vm_ip", returnStdout: true).trim()
-                    
-                    // Write the Ansible inventory file
-                    def inventoryContent = """
-                    all:
-                      hosts:
-                        web:
-                          ansible_host: ${vmIp}
-                          ansible_user: centos
-                          ansible_ssh_private_key_file: /root/.ssh/id_rsa
-                    """
-                    writeFile file: '/var/lib/jenkins/workspace/terra-ans/ansible/inventory.gcp.yml', text: inventoryContent
+                    // Clear and prepare inventory file
+                    sh '''
+                    mkdir -p /var/lib/jenkins/workspace/loadbalancer
+                    > /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml  # Clear file content
+
+                    INSTANCE_IDS=$(gcloud compute instance-groups managed list-instances apache-instance-group --zone us-central1-a --project primal-gear-436812-t0 --format="value(instance)")
+
+                    for INSTANCE_ID in $INSTANCE_IDS; do
+                        INSTANCE_IP=$(gcloud compute instances describe $INSTANCE_ID --zone us-central1-a --project primal-gear-436812-t0 --format="value(networkInterfaces[0].accessConfigs[0].natIP)")
+                        
+                        echo "$${INSTANCE_ID}:" >> /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml
+                        echo "  hosts:" >> /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml
+                        echo "    web_$${INSTANCE_ID}:" >> /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml
+                        echo "      ansible_host: $${INSTANCE_IP}" >> /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml
+                        echo "      ansible_user: centos" >> /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml
+                        echo "      ansible_ssh_private_key_file: /root/.ssh/id_rsa" >> /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml
+                    done
+                    '''
                 }
             }
         }
-        stage('Add Host Key to SSH Known Hosts') {
+        stage('Add Host Keys to SSH Known Hosts') {
             steps {
                 script {
-                    // Add the VM IP to SSH known_hosts to avoid SSH fingerprint confirmation
-                    def vmIp = sh(script: "terraform output -raw vm_ip", returnStdout: true).trim()
-                    sh "ssh-keyscan -H ${vmIp} >> /root/.ssh/known_hosts || true"
+                    def instanceIps = sh(script: "awk '/ansible_host/ {print \$2}' /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml", returnStdout: true).trim().split('\n')
+
+                    for (ip in instanceIps) {
+                        sh "ssh-keyscan -H ${ip} >> ~/.ssh/known_hosts || true"
+                    }
                 }
             }
         }
         stage('Install Apache using Ansible') {
             steps {
-                withEnv(['ANSIBLE_CONFIG=ansible/ansible.cfg']) {  // Ensure the ansible.cfg is correctly set up
-                    sh 'ansible-playbook -i /var/lib/jenkins/workspace/terra-ans/inventory.gcp.yml /var/lib/jenkins/workspace/terra-ans/apache_install.yml'
-                }
+                sh 'ansible-playbook -i /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml /var/lib/jenkins/workspace/loadbalancer/apache_install.yml'
             }
-        }
-    }
-    post {
-        always {
-            cleanWs()  // Clean up the workspace after the pipeline run
         }
     }
 }
