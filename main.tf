@@ -78,9 +78,35 @@ resource "google_compute_global_address" "lb_ip" {
 output "lb_external_ip" {
   value = google_compute_global_address.lb_ip.address
 }
+
+resource "google_compute_instance" "centos_vm" {
+  count        = var.instance_count
+  name         = "centos-vm-${count.index}"
+  machine_type = "e2-medium"
+  zone         = "us-central1-a"
+
+  boot_disk {
+    initialize_params {
+      image = "centos-cloud/centos-stream-9"
+    }
+  }
+
+  network_interface {
+    network = "default"
+    access_config {}
+  }
+}
+
 output "vm_ips" {
   value = [for instance in google_compute_instance.centos_vm : instance.network_interface[0].access_config[0].nat_ip]
 }
+
+variable "instance_count" {
+  description = "The number of instances to create."
+  type        = number
+  default     = 2
+}
+
 resource "null_resource" "generate_inventory" {
   provisioner "local-exec" {
     command = <<EOT
