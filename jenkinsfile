@@ -2,7 +2,6 @@ pipeline {
     agent any
     environment {
         GOOGLE_APPLICATION_CREDENTIALS = credentials('gcp-sa')
-        
     }
     stages {
         stage('Checkout Code') {
@@ -32,7 +31,6 @@ pipeline {
                 sh 'chmod 755 /var/lib/jenkins/workspace/loadbalancer'
             }
         }
-
         stage('Generate and Update Ansible Inventory') {
             steps {
                 script {
@@ -60,6 +58,11 @@ pipeline {
 
                     // Write the inventory content to the file
                     writeFile file: '/var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml', text: inventoryContent
+
+                    // Append IPs to known_hosts
+                    for (def ip : vmIps) {
+                        sh "ssh-keyscan -H ${ip} >> /root/.ssh/known_hosts"
+                    }
                 }
             }
         }
