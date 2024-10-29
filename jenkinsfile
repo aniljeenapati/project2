@@ -24,7 +24,7 @@ pipeline {
         }
         stage('Wait for VM to be ready') {
             steps {
-                sleep(time: 30, unit: "SECONDS")
+                sleep(time: 60, unit: "SECONDS")
             }
         }
         stage('Fix Directory Permissions') {
