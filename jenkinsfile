@@ -66,18 +66,18 @@ pipeline {
                 }
             }
         }
-        stage('Add Host Keys') {
-          steps {
-            script {
-               def vmIpJson = sh(script: "terraform output -json vm_ips", returnStdout: true).trim()
-               def vmIps = readJSON text: vmIpJson
+        stage('Cleanup known_hosts') {
+            steps {
+                script {
+                    def vmIpJson = sh(script: "terraform output -json vm_ips", returnStdout: true).trim()
+                    def vmIps = readJSON text: vmIpJson
 
-            // Add each IP to the known_hosts file
-               vmIps.each { ip ->
-                sh "ssh-keyscan -H ${ip} >> /root/.ssh/known_hosts || true"
-               }
+            // Remove old entries for each IP
+                    for (int i = 0; i < vmIps.size(); i++) {
+                        sh "ssh-keygen -R ${vmIps[i]} || true"
+                    }
+                }
             }
-          }
         }
 
         stage('Install Apache using Ansible') {
