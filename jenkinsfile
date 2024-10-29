@@ -1,83 +1,151 @@
 pipeline {
+
     agent any
+
     environment {
+
         GOOGLE_APPLICATION_CREDENTIALS = credentials('gcp-sa')
+
         
+
     }
+
     stages {
+
         stage('Checkout Code') {
+
             steps {
+
                 git branch: 'main', url: 'https://github.com/aniljeenapati/project2.git'
+
             }
+
         }
+
         stage('Terraform Init') {
+
             steps {
+
                 sh 'terraform init'
+
             }
+
         }
+
         stage('Terraform Apply') {
+
             steps {
+
                 withCredentials([file(credentialsId: 'gcp-sa', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+
                     sh 'terraform apply -auto-approve'
+
                 }
+
             }
+
         }
+
         stage('Wait for VM to be ready') {
+
             steps {
+
                 sleep(time: 30, unit: "SECONDS")
+
             }
+
         }
+
         stage('Generate and Update Ansible Inventory') {
-            steps {
-                script {
-                    def vmIpsJson = sh(script: 'terraform output -json vm_ips', returnStdout: true).trim()
-                    def jsonSlurper = new groovy.json.JsonSlurper()
-                    def vmIps = jsonSlurper.parseText(vmIpsJson)
 
-                    def inventoryContent = ""
-                    vmIps.each { ip ->
-                        inventoryContent += "${ip}\n"
+            steps {
+
+                script {
+
+                    // Capture the JSON output and parse it
+
+                    def vmIpJson = sh(script: "terraform output -json vm_ips", returnStdout: true).trim()
+
+                    def vmIps = readJSON text: vmIpJson
+
+
+
+                    // Create inventory content with multiple hosts
+
+                    def inventoryContent = """
+
+                    all:
+
+                      children:
+
+                        web:
+
+                          hosts:
+
+                    """
+
+
+
+                    // Iterate over the IPs and append to inventory content
+
+                    for (int i = 0; i < vmIps.size(); i++) {
+
+                        inventoryContent += """
+
+                              web_ansible-${i + 1}:
+
+                                ansible_host: ${vmIps[i]}
+
+                                ansible_user: centos
+
+                                ansible_ssh_private_key_file: /root/.ssh/id_rsa
+
+                        """
+
                     }
 
-                    writeFile file: 'inventory/hosts', text: inventoryContent
-                    echo "Generated Ansible Inventory:\n${inventoryContent}"
+
+
+                    // Write the inventory content to the file
+
+                    writeFile file: '/var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml', text: inventoryContent
+
+
+
+                    // Debug: Print the inventory file content
+
+                    sh 'cat /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml'
+
                 }
+
             }
+
         }
 
-        stage('Add SSH Host Keys') {
-            steps {
-                script {
-                    // Loop through each IP and add it to known_hosts
-                    def vmIpsJson = sh(script: 'terraform output -json vm_ips', returnStdout: true).trim()
-                    def jsonSlurper = new groovy.json.JsonSlurper()
-                    def vmIps = jsonSlurper.parseText(vmIpsJson)
+        stage('Add Host Key') {
 
-                    vmIps.each { ip ->
-                        sh "ssh-keyscan -H ${ip} >> ~/.ssh/known_hosts"
-                    }
+            steps {
+
+                script {
+
+                    def vmIp = sh(script: "terraform output -json vm_ips", returnStdout: true).trim()
+
+                    sh "ssh-keyscan -H ${vmIp} >> /root/.ssh/known_hosts || true"
+
                 }
+
             }
+
         }
 
         stage('Install Apache using Ansible') {
-            steps {
-                script {
-                    sh 'ansible-playbook -i inventory/hosts install_apache.yml'
-                }
-            }
-        }
-    }
 
-    post {
-        always {
-            echo 'Cleaning up...'
+            steps {
+
+                sh 'ansible-playbook -i /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml /var/lib/jenkins/workspace/loadbalancer/apache_install.yml'
+
+            }
+
         }
-        success {
-            echo 'Pipeline executed successfully!'
-        }
-        failure {
-            echo 'Pipeline failed. Check the logs for details.'
-        }
+
     }
-}
