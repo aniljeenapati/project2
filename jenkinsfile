@@ -60,14 +60,20 @@ pipeline {
                 }
             }
         }
-        stage('Add Host Key') {
-            steps {
-                script {
-                    def vmIp = sh(script: "terraform output -json vm_ips", returnStdout: true).trim()
-                    sh "ssh-keyscan -H ${vmIp} >> /root/.ssh/known_hosts || true"
-                }
+        stage('Add Host Keys') {
+          steps {
+            script {
+               def vmIpJson = sh(script: "terraform output -json vm_ips", returnStdout: true).trim()
+               def vmIps = readJSON text: vmIpJson
+
+            // Add each IP to the known_hosts file
+               vmIps.each { ip ->
+                sh "ssh-keyscan -H ${ip} >> /root/.ssh/known_hosts || true"
+               }
             }
+          }
         }
+
         stage('Install Apache using Ansible') {
             steps {
                 sh 'ansible-playbook -i /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml /var/lib/jenkins/workspace/loadbalancer/apache_install.yml'
