@@ -27,6 +27,12 @@ pipeline {
                 sleep(time: 30, unit: "SECONDS")
             }
         }
+        stage('Fix Directory Permissions') {
+            steps {
+                sh 'chmod 755 /var/lib/jenkins/workspace/loadbalancer'
+            }
+        }
+
         stage('Generate and Update Ansible Inventory') {
             steps {
                 script {
