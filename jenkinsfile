@@ -1,23 +1,32 @@
 pipeline {
     agent any
-
+    environment {
+        GOOGLE_APPLICATION_CREDENTIALS = credentials('gcp-sa')
+        
+    }
     stages {
-        stage('Terraform Init') {
+        stage('Checkout Code') {
             steps {
-                script {
-                    sh 'terraform init'
-                }
+                git branch: 'main', url: 'https://github.com/aniljeenapati/project2.git'
             }
         }
-
+        stage('Terraform Init') {
+            steps {
+                sh 'terraform init'
+            }
+        }
         stage('Terraform Apply') {
             steps {
-                script {
+                withCredentials([file(credentialsId: 'gcp-sa', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
                     sh 'terraform apply -auto-approve'
                 }
             }
         }
-
+        stage('Wait for VM to be ready') {
+            steps {
+                sleep(time: 30, unit: "SECONDS")
+            }
+        }
         stage('Generate and Update Ansible Inventory') {
             steps {
                 script {
