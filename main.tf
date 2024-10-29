@@ -16,7 +16,10 @@ resource "google_compute_instance_template" "default" {
     network = "default"
     access_config {}
   }
-}
+  metadata = {
+    ssh-keys = "centos:${file("/root/.ssh/id_rsa.pub")}"
+    }
+  }
 
 resource "google_compute_instance_group_manager" "default" {
   name               = "apache-instance-group"
