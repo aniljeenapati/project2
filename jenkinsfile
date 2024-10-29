@@ -60,9 +60,6 @@ pipeline {
 
                     // Write the inventory content to the file
                     writeFile file: '/var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml', text: inventoryContent
-
-                    // Debug: Print the inventory file content
-                    sh 'cat /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml'
                 }
             }
         }
