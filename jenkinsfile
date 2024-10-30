@@ -2,6 +2,7 @@ pipeline {
     agent any
     environment {
         GOOGLE_APPLICATION_CREDENTIALS = credentials('gcp-sa')
+        ANSIBLE_CONFIG = '/var/lib/jenkins/workspace/loadbalancer/ansible.cfg'
     }
     stages {
         stage('Checkout Code') {
@@ -62,7 +63,6 @@ pipeline {
         }
         stage('Install Apache using Ansible') {
             steps {
-                sshagent(['gcp-ssh-key'])
                 sh 'ansible-playbook -i /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml /var/lib/jenkins/workspace/loadbalancer/apache_install.yml'
             }
         }
