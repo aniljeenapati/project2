@@ -76,5 +76,5 @@ resource "google_compute_global_forwarding_rule" "default" {
   port_range = "80"
 }
 output "vm_ips" {
-  value = [for instance in google_compute_instance.centos_vm : instance.network_interface[0].access_config[0].nat_ip]
+  value = [for i in range(google_compute_instance_group_manager.default.target_size) : google_compute_instance_group_manager.default.instance_group[i].network_interface[0].access_config[0].nat_ip]
 }
