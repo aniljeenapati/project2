@@ -97,7 +97,8 @@ resource "google_compute_instance" "centos_vm" {
   network_interface {
     network = "default"
     access_config {}
-  }
+  }  
+tags = ["http-server"]
 }
 
 output "vm_ips" {
