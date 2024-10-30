@@ -77,11 +77,8 @@ resource "google_compute_global_forwarding_rule" "default" {
 }
 
 data "google_compute_instance_group" "default" {
-  # Create a dependency to ensure this is created after the instance group manager
-  depends_on = [google_compute_instance_group_manager.default]
-
-  # Use the instance group from the instance group manager
-  instance_group = google_compute_instance_group_manager.default.instance_group
+  # Use the instance group self_link to reference the instance group
+  self_link = google_compute_instance_group_manager.default.instance_group_self_link
 }
 
 output "vm_ips" {
