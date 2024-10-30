@@ -1,3 +1,7 @@
+provider "google" {
+  project = "primal-gear-436812-t0"
+}
+
 resource "google_compute_instance_template" "default" {
   name           = "apache-instance-template"
   machine_type   = "e2-medium"
