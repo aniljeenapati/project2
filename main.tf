@@ -75,6 +75,10 @@ resource "google_compute_global_forwarding_rule" "default" {
   target     = google_compute_target_http_proxy.default.id
   port_range = "80"
 }
+data "google_compute_instance_group" "default" {
+  instance_group = google_compute_instance_group_manager.default.instance_group
+}
+
 output "vm_ips" {
-  value = [for i in range(google_compute_instance_group_manager.default.target_size) : google_compute_instance_group_manager.default.instance_group[i].network_interface[0].access_config[0].nat_ip]
+  value = [for instance in data.google_compute_instance_group.default.instances : instance.network_interface[0].access_config[0].nat_ip]
 }
