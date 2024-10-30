@@ -55,14 +55,6 @@ pipeline {
                                 ansible_ssh_private_key_file: /root/.ssh/id_rsa
                         """
                     }
-
-                    // Write the inventory content to the file
-                    writeFile file: '/var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml', text: inventoryContent
-
-                    // Append IPs to known_hosts
-                    for (def ip : vmIps) {
-                        sh "ssh-keyscan -H ${ip} >> /root/.ssh/known_hosts"
-                    }
                 }
             }
         }
