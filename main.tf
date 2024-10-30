@@ -17,7 +17,7 @@ resource "google_compute_instance_template" "default" {
     access_config {}
   }
   metadata = {
-    ssh-keys = "centos:${file("/root/.ssh/id_rsa.pub")}"
+    ssh-keys = "centos:${file("/var/lib/jenkins/.ssh/id_rsa.pub")}"
     }
   }
 
@@ -122,7 +122,7 @@ resource "null_resource" "generate_inventory" {
         echo "        web_ansible-$((i + 1)):" >> /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml
         echo "          ansible_host: \$INSTANCE_IP" >> /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml
         echo "          ansible_user: centos" >> /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml
-        echo "          ansible_ssh_private_key_file: /root/.ssh/id_rsa" >> /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml
+        echo "          ansible_ssh_private_key_file: /var/lib/jenkins/.ssh/id_rsa" >> /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml
       done
     EOT
   }
