@@ -62,6 +62,7 @@ pipeline {
         }
         stage('Install Apache using Ansible') {
             steps {
+                sshagent(['gcp-ssh-key'])
                 sh 'ansible-playbook -i /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml /var/lib/jenkins/workspace/loadbalancer/apache_install.yml'
             }
         }
