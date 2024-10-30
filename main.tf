@@ -1,10 +1,7 @@
-provider "google" {
-  project = "primal-gear-436812-t0"
-}
-
 resource "google_compute_instance_template" "default" {
   name           = "apache-instance-template"
   machine_type   = "e2-medium"
+  region         = "us-central1"
 
   disk {
     auto_delete  = true
@@ -16,10 +13,11 @@ resource "google_compute_instance_template" "default" {
     network = "default"
     access_config {}
   }
-  metadata = {
-    ssh-keys = "centos:${file("/var/lib/jenkins/.ssh/id_rsa.pub")}"
-    }
-  }
+  metadata_startup_script = <<-EOF
+    #!/bin/bash
+    sudo systemctl start sshd
+    EOF
+}
 
 resource "google_compute_instance_group_manager" "default" {
   name               = "apache-instance-group"
@@ -37,14 +35,14 @@ resource "google_compute_instance_group_manager" "default" {
 }
 
 resource "google_compute_backend_service" "default" {
-  name                  = "apache-backend-service"
+  name          = "apache-backend-service"
   backend {
     group = google_compute_instance_group_manager.default.instance_group
   }
-  health_checks         = [google_compute_http_health_check.default.id]
-  port_name             = "http"
-  protocol              = "HTTP"
-  timeout_sec           = 30
+  health_checks = [google_compute_http_health_check.default.id]
+  port_name     = "http"
+  protocol      = "HTTP"
+  timeout_sec   = 30
   load_balancing_scheme = "EXTERNAL"
 }
 
@@ -73,41 +71,6 @@ resource "google_compute_global_forwarding_rule" "default" {
   target     = google_compute_target_http_proxy.default.id
   port_range = "80"
 }
-
-resource "google_compute_global_address" "lb_ip" {
-  name = "apache-lb-ip"
-}
-
-output "lb_external_ip" {
-  value = google_compute_global_address.lb_ip.address
-}
-
-resource "google_compute_instance" "centos_vm" {
-  count        = var.instance_count
-  name         = "centos-vm-${count.index}"
-  machine_type = "e2-medium"
-  zone         = "us-central1-a"
-
-  boot_disk {
-    initialize_params {
-      image = "centos-cloud/centos-stream-9"
-    }
-  }
-
-  network_interface {
-    network = "default"
-    access_config {}
-  }  
-tags = ["http-server"]
-}
-
 output "vm_ips" {
   value = [for instance in google_compute_instance.centos_vm : instance.network_interface[0].access_config[0].nat_ip]
 }
-
-variable "instance_count" {
-  description = "The number of instances to create."
-  type        = number
-  default     = 2
-}
-
