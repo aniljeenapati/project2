@@ -75,7 +75,12 @@ resource "google_compute_global_forwarding_rule" "default" {
   target     = google_compute_target_http_proxy.default.id
   port_range = "80"
 }
+
 data "google_compute_instance_group" "default" {
+  # Create a dependency to ensure this is created after the instance group manager
+  depends_on = [google_compute_instance_group_manager.default]
+
+  # Use the instance group from the instance group manager
   instance_group = google_compute_instance_group_manager.default.instance_group
 }
 
