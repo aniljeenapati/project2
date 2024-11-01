@@ -7,16 +7,19 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
+                echo 'Checking out the code from GitHub...'
                 git branch: 'main', url: 'https://github.com/aniljeenapati/project2.git'
             }
         }
         stage('Terraform Init') {
             steps {
+                echo 'Initializing Terraform...'
                 sh 'terraform init'
             }
         }
         stage('Terraform Apply') {
             steps {
+                echo 'Applying Terraform configuration...'
                 withCredentials([file(credentialsId: 'gcp-sa', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
                     sh 'terraform apply -auto-approve'
                 }
@@ -24,14 +27,15 @@ pipeline {
         }
         stage('Wait for VM to be ready') {
             steps {
+                echo 'Waiting for VM to be ready...'
                 sleep(time: 30, unit: "SECONDS")
             }
         }
 
-/*
         stage('Generate and Update Ansible Inventory') {
             steps {
                 script {
+                    echo 'Generating Ansible inventory...'
                     def vmIpJson = sh(script: "terraform output -json vm_ips", returnStdout: true).trim()
                     def vmIps = readJSON text: vmIpJson
 
@@ -43,7 +47,7 @@ pipeline {
                           hosts:
                     """
 
-            // Append each IP to the inventory content
+                    // Append each IP to the inventory content
                     vmIps.eachWithIndex { ip, index ->
                         inventoryContent += """
                               web_ansible-${index + 1}:
@@ -53,30 +57,33 @@ pipeline {
                         """
                     }
 
-            // Write inventory content to the file
+                    // Write inventory content to the file
                     writeFile file: '/var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml', text: inventoryContent
                 }
             }
         }
-*/
+
         stage('Install Apache using Ansible') {
             steps {
+                echo 'Installing Apache using Ansible...'
                 sh 'ansible-playbook -i /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml /var/lib/jenkins/workspace/loadbalancer/apache_install.yml'
             }
         }
-        stage('Terraform Init') {
+        stage('LoadBalancer Init') {
             steps {
-              dir('terra') {
-                sh 'terraform init'
+                echo 'Initializing LoadBalancer Terraform configuration...'
+                dir('terra') {
+                    sh 'terraform init'
                 }
             }
         }
         stage('Load Balancer') {
             steps {
-              dir('terra') {
-                withCredentials([file(credentialsId: 'gcp-sa', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
-                    sh 'terraform apply -auto-approve'
-                  }
+                echo 'Applying Load Balancer Terraform configuration...'
+                dir('terra') {
+                    withCredentials([file(credentialsId: 'gcp-sa', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                        sh 'terraform apply -auto-approve'
+                    }
                 }
             }
         }
