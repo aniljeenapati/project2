@@ -45,10 +45,12 @@ data "google_compute_instance_group" "default" {
   zone = "us-central1-a"
 }
 
+# Fetching the instances separately without using count
 data "google_compute_instance" "instances" {
-  count = length(data.google_compute_instance_group.default.instances)
-  name  = data.google_compute_instance_group.default.instances[count.index].name
-  zone  = "us-central1-a"
+  for_each = toset(data.google_compute_instance_group.default.instances)
+
+  name = each.key
+  zone = "us-central1-a"
 }
 
 # Output the VM IPs
@@ -78,4 +80,3 @@ resource "null_resource" "generate_ansible_inventory" {
     google_compute_instance_group_manager.default
   ]
 }
-
