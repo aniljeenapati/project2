@@ -22,6 +22,9 @@ resource "google_compute_instance_template" "default" {
     sudo systemctl start sshd
     EOF
 }
+output "vm_ips" {
+  value = [for instance in google_compute_instance.apache_instance : instance.network_interface[0].access_config[0].nat_ip]
+}
 
 resource "google_compute_instance_group_manager" "default" {
   name               = "apache-instance-group"
@@ -80,11 +83,6 @@ data "google_compute_instance_group" "default" {
   # Reference the instance group created by the instance group manager
   # Use the instance_group attribute from the instance group manager
   self_link = google_compute_instance_group_manager.default.instance_group
-}
-
-output "vm_ips" {
-  value = [for instance in data.google_compute_instance_group.default.instances : instance.network_interface[0].access_config[0].nat_ip]
-  sensitive = true
 }
 
 resource "null_resource" "generate_ansible_inventory" {
