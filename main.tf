@@ -29,6 +29,10 @@ resource "google_compute_instance_template" "default" {
   tags = ["http-server"]
 }
 
+output "vm_ips" {
+  value = [for instance in google_compute_instance.centos_vm : instance.network_interface[0].access_config[0].nat_ip]
+}
+
 resource "null_resource" "generate_inventory" {
   provisioner "local-exec" {
     command = <<EOT
