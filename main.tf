@@ -39,6 +39,10 @@ resource "google_compute_instance_group_manager" "default" {
   }
 }
 
+output "vm_ips" {
+  value = [for instance in data.google_compute_instance.instances : instance.network_interface[0].access_config[0].nat_ip]
+}
+
 # Create a null resource to fetch the IPs after the instances are created
 resource "null_resource" "get_instance_ips" {
   provisioner "local-exec" {
