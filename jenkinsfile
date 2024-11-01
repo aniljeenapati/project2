@@ -35,11 +35,10 @@ pipeline {
         stage('Generate and Update Ansible Inventory') {
             steps {
                 script {
-                    // Capture the JSON output and parse it
                     def vmIpJson = sh(script: "terraform output -json vm_ips", returnStdout: true).trim()
                     def vmIps = readJSON text: vmIpJson
 
-                    // Create inventory content with multiple hosts
+                    // Start building the inventory file content
                     def inventoryContent = """
                     all:
                       children:
@@ -47,20 +46,22 @@ pipeline {
                           hosts:
                     """
 
-                    // Iterate over the IPs and append to inventory content
-                    for (int i = 0; i < vmIps.size(); i++) {
+            // Append each IP to the inventory content
+                    vmIps.eachWithIndex { ip, index ->
                         inventoryContent += """
-                              web_ansible-${i + 1}:
-                                ansible_host: ${vmIps[i]}
+                              web_ansible-${index + 1}:
+                                ansible_host: ${ip}
                                 ansible_user: centos
                                 ansible_ssh_private_key_file: /var/lib/jenkins/.ssh/id_rsa
                         """
                     }
-                    // Write inventory content to the file
+
+            // Write inventory content to the file
                     writeFile file: '/var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml', text: inventoryContent
                 }
             }
         }
+
         stage('Install Apache using Ansible') {
             steps {
                 sh 'ansible-playbook -i /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml /var/lib/jenkins/workspace/loadbalancer/apache_install.yml'
