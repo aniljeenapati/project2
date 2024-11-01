@@ -31,7 +31,6 @@ pipeline {
                 sleep(time: 30, unit: "SECONDS")
             }
         }
-
         stage('Generate and Update Ansible Inventory') {
             steps {
                 script {
