@@ -31,6 +31,42 @@ pipeline {
                 sleep(time: 30, unit: "SECONDS")
             }
         }
+stage('Fetch Instance IPs') {
+    steps {
+        script {
+            // Use gcloud to fetch the external IPs of instances in the managed instance group
+            def instanceIps = sh(script: """
+                gcloud compute instance-groups list-instances apache-instance-group \
+                    --zone us-central1-a --format='get(instance)' | \
+                    xargs -I {} gcloud compute instances describe {} \
+                    --zone us-central1-a --format='get(networkInterfaces[0].accessConfigs[0].natIP)'
+            """, returnStdout: true).trim().split("\n")
+
+            // Create the Ansible inventory
+            def inventoryContent = """
+            all:
+              children:
+                web:
+                  hosts:
+            """
+
+            instanceIps.eachWithIndex { ip, index ->
+                inventoryContent += """
+                    web_ansible-${index + 1}:
+                      ansible_host: ${ip}
+                      ansible_user: centos
+                      ansible_ssh_private_key_file: /var/lib/jenkins/.ssh/id_rsa
+                """
+            }
+
+            // Write the inventory content to the file
+            writeFile file: '/var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml', text: inventoryContent
+            sh 'cat /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml'
+        }
+    }
+}
+
+/*
         stage('Generate and Update Ansible Inventory') {
             steps {
                 script {
@@ -64,7 +100,7 @@ pipeline {
                 }
             }
         }
-
+*/
         stage('Add Existing Host Keys') {
             steps {
                 script {
