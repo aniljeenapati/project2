@@ -111,8 +111,7 @@ pipeline {
                 sh 'ansible-playbook -i /var/lib/jenkins/workspace/loadbalancer/inventory.gcp.yml /var/lib/jenkins/workspace/loadbalancer/apache_install.yml'
             }
         }
-    }
-}
+
         stage('LoadBalancer Init') {
             steps {
                 echo 'Initializing LoadBalancer Terraform configuration...'
@@ -121,15 +120,10 @@ pipeline {
                 }
             }
         }
+        
         stage('Load Balancer') {
             steps {
                 echo 'Applying Load Balancer Terraform configuration...'
                 dir('terra') {
                     withCredentials([file(credentialsId: 'gcp-sa', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
-                        sh 'terraform apply -auto-approve'
-                    }
-                }
-            }
-        }
-    }
-}
+                        sh 'terrafo
