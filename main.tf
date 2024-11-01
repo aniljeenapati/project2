@@ -65,7 +65,7 @@ resource "null_resource" "generate_ansible_inventory" {
       echo "  children:" >> inventory.gcp.yml
       echo "    web:" >> inventory.gcp.yml
       echo "      hosts:" >> inventory.gcp.yml
-      for ip in $(terraform output -json vm_ips | jq -r '.[]'); do
+      for ip in \$(terraform output -json vm_ips | jq -r '.[]'); do
         echo "        web_ansible-\${ip}:" >> inventory.gcp.yml
         echo "          ansible_host: \${ip}" >> inventory.gcp.yml
         echo "          ansible_user: centos" >> inventory.gcp.yml
