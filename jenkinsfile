@@ -126,4 +126,10 @@ pipeline {
                 echo 'Applying Load Balancer Terraform configuration...'
                 dir('terra') {
                     withCredentials([file(credentialsId: 'gcp-sa', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
-                        sh 'terrafo
+                        sh 'terraform apply -auto-approve'
+                    }
+                }
+            }
+        }
+    }
+}
