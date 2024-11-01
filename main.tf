@@ -83,5 +83,5 @@ data "google_compute_instance_group" "default" {
 }
 
 output "vm_ips" {
-  value = [for instance in data.google_compute_instance_group.default.instances : instance.network_interface[0].access_config[0].nat_ip]
+  value = [for instance in google_compute_instance.apache_instance : instance.network_interface[0].access_config[0].nat_ip]
 }
