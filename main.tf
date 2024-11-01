@@ -83,5 +83,34 @@ data "google_compute_instance_group" "default" {
 }
 
 output "vm_ips" {
-  value = [for instance in google_compute_instance.apache_instance : instance.network_interface[0].access_config[0].nat_ip]
+  value = [for instance in data.google_compute_instance_group.default.instances : instance.network_interface[0].access_config[0].nat_ip]
+  sensitive = true
 }
+
+resource "null_resource" "generate_ansible_inventory" {
+  provisioner "local-exec" {
+    command = <<EOT
+      # Get the VM IPs as JSON
+      terraform output -json vm_ips | jq -r '
+        .[] | 
+        {"hosts": ("web_ansible-" + tostring), "ansible_host": .}
+      ' > temp_inventory.json
+
+      # Begin the inventory file
+      echo "all:" > inventory.gcp.yml
+      echo "  children:" >> inventory.gcp.yml
+      echo "    web:" >> inventory.gcp.yml
+      echo "      hosts:" >> inventory.gcp.yml
+
+      # Append IPs as individual hosts
+      jq -r '.[] | "        \(.hosts):\n          ansible_host: \(.ansible_host)\n          ansible_user: centos\n          ansible_ssh_private_key_file: /var/lib/jenkins/.ssh/id_rsa"' temp_inventory.json >> inventory.gcp.yml
+
+      # Clean up
+      rm temp_inventory.json
+    EOT
+    working_dir = path.module
+  }
+
+  depends_on = [google_compute_instance_group_manager.default]
+}
+
