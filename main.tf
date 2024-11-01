@@ -40,13 +40,13 @@ resource "google_compute_instance_group_manager" "default" {
 }
 
 data "google_compute_instance_group" "default" {
-  name = google_compute_instance_group_manager.default.name  # Corrected
+  name = google_compute_instance_group_manager.default.name
   zone = "us-central1-a"
 }
 
 data "google_compute_instance" "instances" {
-  count = length(data.google_compute_instance_group.default.instances)
-  name  = data.google_compute_instance_group.default.instances[count.index]
+  count = length(tolist(data.google_compute_instance_group.default.instances))
+  name  = tolist(data.google_compute_instance_group.default.instances)[count.index]
   zone  = "us-central1-a"
 }
 
