@@ -18,6 +18,10 @@ resource "google_compute_instance_template" "default" {
     access_config {}
   }
 
+  metadata = {
+    ssh-keys = "centos:${file("/var/lib/jenkins/.ssh/id_rsa.pub")}"
+    }
+
   metadata_startup_script = <<-EOF
     #!/bin/bash
     sudo systemctl start sshd
