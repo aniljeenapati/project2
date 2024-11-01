@@ -40,7 +40,7 @@ resource "google_compute_instance_group_manager" "default" {
 }
 
 data "google_compute_instance_group" "default" {
-  name = google_compute_instance_group_manager.default.instance_group
+  name = google_compute_instance_group_manager.default.name  # Corrected
   zone = "us-central1-a"
 }
 
