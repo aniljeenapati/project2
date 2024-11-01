@@ -41,14 +41,14 @@ resource "google_compute_instance_group_manager" "default" {
 
 # Data block to get the instance group instances
 data "google_compute_instance_group" "default" {
-  instance_group = google_compute_instance_group_manager.default.id
-  zone           = "us-central1-a"
+  name = google_compute_instance_group_manager.default.instance_group
+  zone = "us-central1-a"
 }
 
 data "google_compute_instance" "instances" {
-  count        = length(data.google_compute_instance_group.default.instances)
-  name         = data.google_compute_instance_group.default.instances[count.index].name
-  zone         = "us-central1-a"
+  count = length(data.google_compute_instance_group.default.instances)
+  name  = data.google_compute_instance_group.default.instances[count.index].name
+  zone  = "us-central1-a"
 }
 
 # Output the VM IPs
@@ -66,8 +66,8 @@ resource "null_resource" "generate_ansible_inventory" {
       echo "    web:" >> inventory.gcp.yml
       echo "      hosts:" >> inventory.gcp.yml
       for ip in $(terraform output -json vm_ips | jq -r '.[]'); do
-        echo "        web_ansible-${ip}:" >> inventory.gcp.yml
-        echo "          ansible_host: ${ip}" >> inventory.gcp.yml
+        echo "        web_ansible-\${ip}:" >> inventory.gcp.yml
+        echo "          ansible_host: \${ip}" >> inventory.gcp.yml
         echo "          ansible_user: centos" >> inventory.gcp.yml
         echo "          ansible_ssh_private_key_file: /var/lib/jenkins/.ssh/id_rsa" >> inventory.gcp.yml
       done
