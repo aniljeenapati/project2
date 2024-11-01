@@ -66,8 +66,8 @@ resource "null_resource" "generate_ansible_inventory" {
       echo "    web:" >> inventory.gcp.yml
       echo "      hosts:" >> inventory.gcp.yml
       for ip in \$(terraform output -json vm_ips | jq -r '.[]'); do
-        echo "        web_ansible-\${ip}:" >> inventory.gcp.yml
-        echo "          ansible_host: \${ip}" >> inventory.gcp.yml
+        echo "        web_ansible-\$ip:" >> inventory.gcp.yml
+        echo "          ansible_host: \$ip" >> inventory.gcp.yml
         echo "          ansible_user: centos" >> inventory.gcp.yml
         echo "          ansible_ssh_private_key_file: /var/lib/jenkins/.ssh/id_rsa" >> inventory.gcp.yml
       done
@@ -78,3 +78,4 @@ resource "null_resource" "generate_ansible_inventory" {
     google_compute_instance_group_manager.default
   ]
 }
+
