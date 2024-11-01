@@ -46,7 +46,7 @@ data "google_compute_instance_group" "default" {
 
 data "google_compute_instance" "instances" {
   count = length(tolist(data.google_compute_instance_group.default.instances))
-  name  = tolist(data.google_compute_instance_group.default.instances)[count.index]
+  name  = split("/", tolist(data.google_compute_instance_group.default.instances)[count.index])[len(split("/", tolist(data.google_compute_instance_group.default.instances)[count.index])) - 1]
   zone  = "us-central1-a"
 }
 
